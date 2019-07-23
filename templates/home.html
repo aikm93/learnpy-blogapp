@@ -1,0 +1,60 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Blog Application</title>
+    <link rel="shortcut icon" href="#">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
+    <script>
+
+        angular.module("blogApp", [])
+        .controller("HomePageController", homePageController)
+        .service("DataGetService", dataGetService);
+        homePageController.$inject = ['$scope', 'DataGetService']
+        function homePageController($scope, DataGetService) {
+            debugger
+            var ctrl = this;
+
+            ctrl.articleList = [];
+            ctrl.init = init;
+
+            function init() {
+                debugger
+                console.log("Inside init()");
+                DataGetService.getAll()
+                    .then(function(response) {
+                        console.log(response);
+                        ctrl.articleList = response.data;
+                    }, function(error) {
+                        console.err(error);
+                        alert("Some error occurred.");
+                    })
+            }
+        }
+
+        dataGetService.$inject = ['$http']
+        function dataGetService($http) {
+            return {
+                getAll: getAll
+            }
+
+            function getAll() {
+                return $http.get('/get_all_posts')
+            }
+        }
+    </script>
+
+<!--    <script src="../js/home.controller.js"></script>-->
+</head>
+<body>
+    <div ng-app="blogApp" ng-controller="HomePageController as ctrl" ng-init="ctrl.init()">
+        <div ng-repeat="article in ctrl.articleList">
+            <h4 ng-bind="article.subject"></h4>
+            <br><br>
+            <div ng-bind="article.content"></div>
+            <br><span ng-bind="article.date"></span>
+            <br><br>
+        </div>
+    </div>
+    <a href="/create" >Create New Post</a>
+</body>
+</html>
